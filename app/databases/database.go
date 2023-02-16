@@ -20,7 +20,7 @@ func MySql(config config.LoadConfig) *gorm.DB {
 	Db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
 
 	if err != nil {
-		log.Fatal(err.Error())
+		log.Fatalln(err.Error())
 	}
 	return Db
 }
@@ -30,7 +30,7 @@ func Postgres(config config.LoadConfig) *gorm.DB {
 	Db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
 
 	if err != nil {
-		log.Fatal(err.Error())
+		log.Fatalln(err.Error())
 	}
 	return Db
 }
@@ -45,7 +45,7 @@ func MongoDb(config config.LoadConfig) *mongo.Database {
 	}
 	client, err := mongo.Connect(ctx, clientOptions)
 	if err != nil {
-		log.Println(err)
+		log.Fatalln(err)
 		return nil
 	}
 	db := client.Database(config.Database.Name)
@@ -55,19 +55,24 @@ func MongoDb(config config.LoadConfig) *mongo.Database {
 func NewDatabase() (map[string]interface{}, error) {
 	config, err := config.New()
 	if err != nil {
-		log.Fatal(err)
+		log.Fatalln(err)
 		return nil, err
 	}
+	database = make(map[string]interface{})
+
 	if config.Database.Driver == "mysql" {
 		database["type"] = "mysql"
 		database["connection"] = MySql(config)
-		return database, nil
 	} else if config.Database.Driver == "postgres" {
 		database["type"] = "postgres"
 		database["connection"] = Postgres(config)
 	} else if config.Database.Driver == "mongoDb" {
 		database["type"] = "mongoDb"
 		database["connection"] = MongoDb(config)
+	} else {
+		database["type"] = "none"
+		database["connection"] = nil
+		log.Fatalln("Database driver not found")
 	}
 	return database, nil
 }
