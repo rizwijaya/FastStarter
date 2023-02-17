@@ -5,6 +5,8 @@ import (
 	database "FastStarter/app/databases"
 	routesAPIV1 "FastStarter/modules/v1/routes"
 	routesTMPLV1 "FastStarter/public/v1/handler/v1/routes"
+	"errors"
+	"fmt"
 	"log"
 
 	"github.com/gofiber/fiber/v2"
@@ -14,9 +16,28 @@ import (
 
 func NewRouting() (*fiber.App, database.Database) {
 	database := database.NewDatabase()
-	engine := html.New("./public/templates", ".html")
+	engine := html.New("./public/v1/templates", ".html")
 	router := fiber.New(fiber.Config{
 		Views: engine,
+		ErrorHandler: func(ctx *fiber.Ctx, err error) error {
+			code := fiber.StatusInternalServerError
+
+			var e *fiber.Error
+			if errors.As(err, &e) {
+				code = e.Code
+			}
+
+			err = ctx.Status(code).Render(fmt.Sprintf("errors/%d", code), fiber.Map{
+				"Title": "Error " + fmt.Sprintf("%d", code),
+			}, "layouts/main")
+			//Render(fmt.Sprintf("./public/v1/templates/errors/%d.html", code))
+			if err != nil {
+				ctx.Status(fiber.StatusInternalServerError).Render("errors/500.html", fiber.Map{
+					"Title": "Error " + fmt.Sprintf("%d", code),
+				}, "layouts/main")
+			}
+			return nil
+		},
 	})
 
 	router.Use(cors.New())
