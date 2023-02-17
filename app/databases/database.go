@@ -13,9 +13,35 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
-var database map[string]interface{}
+type Database interface {
+	Type() string
+	Mysql() *gorm.DB
+	Postgres() *gorm.DB
+	Mongodb() *mongo.Database
+}
 
-func MySql(config config.LoadConfig) *gorm.DB {
+type database struct {
+}
+
+func NewDatabase() *database {
+	return &database{}
+}
+
+func (d *database) Type() string {
+	config, err := config.New()
+	if err != nil {
+		log.Fatalln(err)
+		return ""
+	}
+	return config.Database.Driver
+}
+
+func (d *database) Mysql() *gorm.DB {
+	config, err := config.New()
+	if err != nil {
+		log.Fatalln(err)
+		return nil
+	}
 	dsn := config.Database.Username + ":" + config.Database.Password + "@tcp(" + config.Database.Host + ":" + config.Database.Port + ")/" + config.Database.Name + "?charset=utf8&parseTime=True&loc=Local"
 	Db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
 
@@ -25,7 +51,12 @@ func MySql(config config.LoadConfig) *gorm.DB {
 	return Db
 }
 
-func Postgres(config config.LoadConfig) *gorm.DB {
+func (d *database) Postgres() *gorm.DB {
+	config, err := config.New()
+	if err != nil {
+		log.Fatalln(err)
+		return nil
+	}
 	dsn := "host=" + config.Database.Host + " user=" + config.Database.Username + " password=" + config.Database.Password + " dbname=" + config.Database.Name + " port=" + config.Database.Port + " sslmode=disable TimeZone=Asia/Jakarta"
 	Db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
 
@@ -35,9 +66,14 @@ func Postgres(config config.LoadConfig) *gorm.DB {
 	return Db
 }
 
-func MongoDb(config config.LoadConfig) *mongo.Database {
+func (d *database) Mongodb() *mongo.Database {
 	var clientOptions *options.ClientOptions
 	ctx := context.TODO()
+	config, err := config.New()
+	if err != nil {
+		log.Fatalln(err)
+		return nil
+	}
 	if config.Database.Username == "" && config.Database.Password == "" {
 		clientOptions = options.Client().ApplyURI("mongodb://" + config.Database.Host + ":" + config.Database.Port)
 	} else {
@@ -50,29 +86,4 @@ func MongoDb(config config.LoadConfig) *mongo.Database {
 	}
 	db := client.Database(config.Database.Name)
 	return db
-}
-
-func NewDatabase() (map[string]interface{}, error) {
-	config, err := config.New()
-	if err != nil {
-		log.Fatalln(err)
-		return nil, err
-	}
-	database = make(map[string]interface{})
-
-	if config.Database.Driver == "mysql" {
-		database["type"] = "mysql"
-		database["connection"] = MySql(config)
-	} else if config.Database.Driver == "postgres" {
-		database["type"] = "postgres"
-		database["connection"] = Postgres(config)
-	} else if config.Database.Driver == "mongoDb" {
-		database["type"] = "mongoDb"
-		database["connection"] = MongoDb(config)
-	} else {
-		database["type"] = "none"
-		database["connection"] = nil
-		log.Fatalln("Database driver not found")
-	}
-	return database, nil
 }
