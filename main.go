@@ -4,7 +4,7 @@ import (
 	"FastStarter/app/config"
 	database "FastStarter/app/databases"
 	routesAPIV1 "FastStarter/modules/v1/routes"
-	routesTMPLV1 "FastStarter/public/handler/v1/routes"
+	routesTMPLV1 "FastStarter/public/v1/handler/v1/routes"
 	"log"
 
 	"github.com/gofiber/fiber/v2"
@@ -12,12 +12,8 @@ import (
 	"github.com/gofiber/template/html"
 )
 
-func NewRouting() (*fiber.App, map[string]interface{}) {
-	database, err := database.NewDatabase()
-	if err != nil {
-		log.Fatal(err)
-	}
-
+func NewRouting() (*fiber.App, database.Database) {
+	database := database.NewDatabase()
 	engine := html.New("./public/templates", ".html")
 	router := fiber.New(fiber.Config{
 		Views: engine,
