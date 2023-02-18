@@ -6,7 +6,7 @@ import (
 	"os"
 )
 
-type LoggerAdapter interface {
+type LoggerPresenter interface {
 	LogError(format string, v ...interface{})
 	LogAccess(format string, v ...interface{})
 }
