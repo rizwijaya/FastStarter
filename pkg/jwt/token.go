@@ -1,7 +1,7 @@
 package token
 
 import (
-	"FastStarter/app/config"
+	"FastStarter/infrastructures/config"
 	"errors"
 
 	"github.com/dgrijalva/jwt-go"
