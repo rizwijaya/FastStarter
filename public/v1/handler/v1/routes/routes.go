@@ -1,7 +1,7 @@
 package routes
 
 import (
-	database "FastStarter/app/databases"
+	database "FastStarter/infrastructures/databases"
 
 	"github.com/gofiber/fiber/v2"
 )

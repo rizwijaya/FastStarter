@@ -1,7 +1,7 @@
 package database
 
 import (
-	"FastStarter/app/config"
+	"FastStarter/infrastructures/config"
 	"context"
 	"log"
 

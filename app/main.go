@@ -1,9 +1,9 @@
 package main
 
 import (
-	"FastStarter/app/config"
-	database "FastStarter/app/databases"
-	routesAPIV1 "FastStarter/modules/v1/routes"
+	"FastStarter/infrastructures/config"
+	database "FastStarter/infrastructures/databases"
+	routesAPIV1 "FastStarter/modules/v1/users/routes"
 	routesTMPLV1 "FastStarter/public/v1/handler/v1/routes"
 	"errors"
 	"fmt"

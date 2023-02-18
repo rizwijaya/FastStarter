@@ -1,23 +1,23 @@
 package handler
 
 import (
-	database "FastStarter/app/databases"
-	repositoryUsers "FastStarter/modules/v1/utilities/users/repository"
-	serviceUsers "FastStarter/modules/v1/utilities/users/service"
+	database "FastStarter/infrastructures/databases"
+	repositoryUsers "FastStarter/modules/v1/users/interfaces/repositories"
+	usecaseUsers "FastStarter/modules/v1/users/usecases"
 )
 
 type usersHandler struct {
-	usersService serviceUsers.Service
+	usersService usecaseUsers.UsecasePresenter
 }
 
-func NewUsersHandler(usersService serviceUsers.Service) *usersHandler {
+func NewUsersHandler(usersService usecaseUsers.UsecasePresenter) *usersHandler {
 	return &usersHandler{usersService}
 }
 
 func Handler(db database.Database) *usersHandler {
 	//Users
 	repository := repositoryUsers.NewRepository(db)
-	service := serviceUsers.NewService(repository)
+	service := usecaseUsers.NewUsecase(repository)
 
 	return NewUsersHandler(service)
 }
