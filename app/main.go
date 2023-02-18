@@ -3,8 +3,8 @@ package main
 import (
 	"FastStarter/infrastructures/config"
 	database "FastStarter/infrastructures/databases"
-	routesAPIV1 "FastStarter/modules/v1/users/routes"
-	routesTMPLV1 "FastStarter/public/v1/handler/v1/routes"
+	routesUserAPIV1 "FastStarter/modules/v1/users/routes"
+	routesUserTMPLV1 "FastStarter/public/v1/handler/v1/routes"
 	"errors"
 	"fmt"
 	"log"
@@ -52,8 +52,8 @@ func main() {
 	}
 
 	router, db := NewRouting()
-	router = routesAPIV1.NewRouter(router, db)
-	router = routesTMPLV1.NewRouter(router, db)
+	router = routesUserAPIV1.NewRouter(router, db)
+	router = routesUserTMPLV1.NewRouter(router, db)
 
 	router.Listen(config.App.Url + ":" + config.App.Port)
 }
